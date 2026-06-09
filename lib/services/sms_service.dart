@@ -31,17 +31,17 @@ class SMSService {
         final String body = message.body ?? '';
         print("📩 [Real-time] Naya SMS aaya: '$body'");
 
-        if (body.isNotEmpty && _isBankSMS(body)) {
+        if (body.isNotEmpty && isBankSMS(body)) {
           print("🏦 [Real-time] Bank SMS detect hua! Processing...");
 
-          final double amount = _extractAmount(body);
+          final double amount = extractAmount(body);
           if (amount > 0) {
             final locationService = LocationService();
             final String? locationName = await locationService.getCurrentLocationName();
 
             // Custom category check karo pehle
             final customCategory = await DatabaseHelper.instance.getCustomMerchantCategory(body);
-            final finalCategory = customCategory ?? _autoDetectCategory(body);
+            final finalCategory = customCategory ?? autoDetectCategory(body);
 
             final int result = await DatabaseHelper.instance.insertTransaction({
               'amount': amount,
@@ -94,19 +94,19 @@ class SMSService {
       );
 
       for (var msg in messages) {
-        if (msg.body != null && _isBankSMS(msg.body!)) {
+        if (msg.body != null && isBankSMS(msg.body!)) {
           print("🔍 [KulkAI Debug] Detected Bank SMS: '${msg.body}'");
           // Date Formatting (Keep full ISO 8601 to preserve transaction time)
           DateTime smsDate = msg.date ?? DateTime.now();
           String formattedDate = smsDate.toIso8601String();
 
           // Amount Extraction
-          double amount = _extractAmount(msg.body!);
+          double amount = extractAmount(msg.body!);
 
           if (amount > 0) {
             // Check if there is a customized category mapping first!
             final customCategory = await DatabaseHelper.instance.getCustomMerchantCategory(msg.body!);
-            final finalCategory = customCategory ?? _autoDetectCategory(msg.body!);
+            final finalCategory = customCategory ?? autoDetectCategory(msg.body!);
 
             // DATABASE CALL: Humne yahan database helper ko integrate kar diya hai
             // Duplicate prevention logic 'insertTransaction' ke andar pehle se hai
@@ -130,7 +130,7 @@ class SMSService {
   }
 
   // Keywords filter optimized for Indian Banks
-  bool _isBankSMS(String body) {
+  bool isBankSMS(String body) {
     final debitKeywords = [
       'debited',
       'spent',
@@ -155,7 +155,7 @@ class SMSService {
   }
 
   // Multi-Pattern Regex for robust amount extraction
-  double _extractAmount(String body) {
+  double extractAmount(String body) {
     List<RegExp> patterns = [
       RegExp(r'(?:RS|INR|Rs\.?|Amt)\s?([0-9][0-9,.]*)\b', caseSensitive: false),
       RegExp(
@@ -181,7 +181,7 @@ class SMSService {
   }
 
   // Category detection for 8 comprehensive categories
-  String _autoDetectCategory(String body) {
+  String autoDetectCategory(String body) {
     String text = body.toLowerCase();
 
     // 1. Kheti/Farming
