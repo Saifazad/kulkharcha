@@ -1,0 +1,42 @@
+name: kulkharcha
+description: "KulKharcha: An AI-powered automated expense tracker that intelligently parses bank SMS to manage daily finances locally and securely."
+publish_to: "none"
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.11.4
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # --- UI & Design ---
+  cupertino_icons: ^1.0.8
+  google_fonts: ^8.1.0
+  smooth_page_indicator: ^2.0.1
+  url_launcher: ^6.3.0
+  workmanager: ^0.9.0
+
+  # --- Data & Storage ---
+  sqflite: ^2.4.2+1
+  path: ^1.9.1
+  shared_preferences: ^2.5.5
+
+  # --- SMS & Permissions (Stable Versions for your environment) ---
+  flutter_sms_inbox: ^1.0.4
+  easy_sms_receiver: ^0.0.2  # Real-time incoming SMS listener ke liye
+  permission_handler: ^11.3.1 # Permissions handle karne ke liye
+  intl: ^0.20.2
+  geolocator: ^14.0.2
+  geocoding: ^4.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+  # assets:
+  #   - assets/images/
