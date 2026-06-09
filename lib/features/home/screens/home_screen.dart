@@ -29,7 +29,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   double _monthlyLimit = 20000.0;
   bool _showMonthly = false;
   bool _isLoading = true;
-  Timer? _autoSyncTimer;
 
   // ── Lifecycle ──────────────────────────────────────────────────────────────
   @override
@@ -38,24 +37,20 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
     _loadPrefs();
     _fetchData();
-    _startTimer();
+    _syncAndFetch(); // App startup par ek baar inbox sync karein
     _startRealtimeListener(); // 📡 Instant SMS detection
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    _autoSyncTimer?.cancel();
     super.dispose();
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      _syncAndFetch();
-      _startTimer();
-    } else if (state == AppLifecycleState.paused) {
-      _autoSyncTimer?.cancel();
+      _syncAndFetch(); // App resume hone par ek baar sync karein
     }
   }
 
@@ -126,14 +121,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       _monthlyExpense = month;
       _isLoading = false;
     });
-  }
-
-  void _startTimer() {
-    _autoSyncTimer?.cancel();
-    _autoSyncTimer = Timer.periodic(
-      const Duration(seconds: 3), // 3 second fallback — real-time listener ke saath backup
-      (_) => _syncAndFetch(),
-    );
   }
 
   // ── Budget helpers ─────────────────────────────────────────────────────────
