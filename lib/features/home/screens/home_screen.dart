@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '../../../data/database/database_helper.dart';
 import '../../../services/sms_service.dart';
@@ -29,6 +30,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   double _monthlyLimit = 20000.0;
   bool _showMonthly = false;
   bool _isLoading = true;
+  bool _isSmsPermissionGranted = true;
 
   // ── Lifecycle ──────────────────────────────────────────────────────────────
   @override
@@ -36,6 +38,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _loadPrefs();
+    _checkPermissionStatus(); // SMS permission status check karein
     _fetchData();
     _syncAndFetch(); // App startup par ek baar inbox sync karein
     _startRealtimeListener(); // 📡 Instant SMS detection
@@ -50,7 +53,17 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
+      _checkPermissionStatus(); // settings se return hone par status refresh karein
       _syncAndFetch(); // App resume hone par ek baar sync karein
+    }
+  }
+
+  Future<void> _checkPermissionStatus() async {
+    final status = await Permission.sms.status;
+    if (mounted) {
+      setState(() {
+        _isSmsPermissionGranted = status.isGranted;
+      });
     }
   }
 
@@ -243,6 +256,51 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 const SizedBox(height: 20),
                 HomeHeader(userName: _userName),
                 const SizedBox(height: 25),
+                if (!_isSmsPermissionGranted) ...[
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFEEBEE),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: const Color(0xFFFFCDD2)),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.warning_amber_rounded, color: Color(0xFFC62828)),
+                        const SizedBox(width: 12),
+                        const Expanded(
+                          child: Text(
+                            "SMS Permission blocked hai. Auto-tracking active nahi hai.",
+                            style: TextStyle(
+                              color: Color(0xFFC62828),
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () => openAppSettings(),
+                          style: TextButton.styleFrom(
+                            backgroundColor: const Color(0xFFC62828),
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          ),
+                          child: const Text(
+                            "Settings",
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 15),
+                ],
                 if (_isLoading)
                   const Padding(
                     padding: EdgeInsets.symmetric(vertical: 60),
