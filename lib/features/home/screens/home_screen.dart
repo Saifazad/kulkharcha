@@ -232,7 +232,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       backgroundColor: const Color(0xFFF8FAF7),
       body: SafeArea(
         child: RefreshIndicator(
-          onRefresh: _fetchData,
+          onRefresh: _syncAndFetch,
           color: const Color(0xFF1B5E20),
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
