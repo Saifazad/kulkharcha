@@ -88,7 +88,9 @@ class TransactionTile extends StatelessWidget {
         child: Row(
           children: [
             CircleAvatar(
-              backgroundColor: style.bgColor,
+              backgroundColor: Theme.of(context).brightness == Brightness.dark
+                  ? style.iconColor.withOpacity(0.15)
+                  : style.bgColor,
               radius: 20,
               child: Icon(style.icon, color: style.iconColor, size: 20),
             ),
@@ -102,9 +104,9 @@ class TransactionTile extends StatelessWidget {
                       Expanded(
                         child: Text(
                           title,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            color: Colors.black87,
+                            color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 15,
                           ),
                           maxLines: 1,
@@ -114,10 +116,10 @@ class TransactionTile extends StatelessWidget {
                       const SizedBox(width: 8),
                       Text(
                         "-₹${amount.toStringAsFixed(0)}",
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontWeight: FontWeight.w800,
                           fontSize: 16,
-                          color: Colors.black87,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
                     ],
@@ -141,19 +143,29 @@ class TransactionTile extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFE8F5E9),
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.green.withOpacity(0.15)
+                            : const Color(0xFFE8F5E9),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.location_on, color: Color(0xFF2E7D32), size: 12),
+                          Icon(
+                            Icons.location_on,
+                            color: Theme.of(context).brightness == Brightness.dark
+                                ? Colors.green[300]
+                                : const Color(0xFF2E7D32),
+                            size: 12,
+                          ),
                           const SizedBox(width: 4),
                           Flexible(
                             child: Text(
                               location!,
-                              style: const TextStyle(
-                                color: Color(0xFF2E7D32),
+                              style: TextStyle(
+                                color: Theme.of(context).brightness == Brightness.dark
+                                    ? Colors.green[300]
+                                    : const Color(0xFF2E7D32),
                                 fontSize: 10,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -284,9 +296,11 @@ class _TransactionDetailSheetState extends State<TransactionDetailSheet> {
     final location = widget.tx['location'] as String?;
 
     return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      decoration: BoxDecoration(
+        color: Theme.of(context).brightness == Brightness.dark
+            ? const Color(0xFF1E1E1E)
+            : Colors.white,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
       ),
       padding: const EdgeInsets.only(left: 24, right: 24, top: 16, bottom: 24),
       child: Column(
@@ -297,7 +311,12 @@ class _TransactionDetailSheetState extends State<TransactionDetailSheet> {
           Center(
             child: Container(
               width: 50, height: 5,
-              decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(10)),
+              decoration: BoxDecoration(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.white24
+                    : Colors.grey[300],
+                borderRadius: BorderRadius.circular(10),
+              ),
             ),
           ),
           const SizedBox(height: 24),
@@ -316,7 +335,7 @@ class _TransactionDetailSheetState extends State<TransactionDetailSheet> {
               ),
               Text(
                 "₹${amount.toStringAsFixed(2)}",
-                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: Colors.black87),
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: Theme.of(context).colorScheme.onSurface),
               ),
             ],
           ),
@@ -335,9 +354,15 @@ class _TransactionDetailSheetState extends State<TransactionDetailSheet> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             decoration: BoxDecoration(
-              color: Colors.grey[50],
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? const Color(0xFF2D2D2D)
+                  : Colors.grey[50],
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.grey[200]!),
+              border: Border.all(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.white10
+                    : Colors.grey[200]!,
+              ),
             ),
             child: DropdownButtonHideUnderline(
               child: DropdownButton<String>(
@@ -369,12 +394,20 @@ class _TransactionDetailSheetState extends State<TransactionDetailSheet> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: const Color(0xFFE8F5E9),
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.green.withOpacity(0.15)
+                    : const Color(0xFFE8F5E9),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.location_on, color: Color(0xFF2E7D32), size: 24),
+                  Icon(
+                    Icons.location_on,
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.green[300]
+                        : const Color(0xFF2E7D32),
+                    size: 24,
+                  ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(
@@ -382,7 +415,13 @@ class _TransactionDetailSheetState extends State<TransactionDetailSheet> {
                       children: [
                         Text(
                           location!,
-                          style: const TextStyle(color: Color(0xFF2E7D32), fontSize: 14, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                            color: Theme.of(context).brightness == Brightness.dark
+                                ? Colors.green[300]
+                                : const Color(0xFF2E7D32),
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                         const Text("Detected via SMS context location",
                             style: TextStyle(color: Colors.grey, fontSize: 10)),
@@ -390,7 +429,12 @@ class _TransactionDetailSheetState extends State<TransactionDetailSheet> {
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.map_outlined, color: Color(0xFF2E7D32)),
+                    icon: Icon(
+                      Icons.map_outlined,
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.green[300]
+                          : const Color(0xFF2E7D32),
+                    ),
                     onPressed: () async {
                       final url = Uri.parse(
                           "https://www.google.com/maps/search/?api=1&query=${Uri.encodeComponent(location)}");
@@ -411,8 +455,22 @@ class _TransactionDetailSheetState extends State<TransactionDetailSheet> {
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(color: Colors.grey[100], borderRadius: BorderRadius.circular(16)),
-            child: Text(desc, style: TextStyle(color: Colors.grey[700], fontSize: 12, height: 1.4)),
+            decoration: BoxDecoration(
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? const Color(0xFF242424)
+                  : Colors.grey[100],
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Text(
+              desc,
+              style: TextStyle(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.white70
+                    : Colors.grey[700],
+                fontSize: 12,
+                height: 1.4,
+              ),
+            ),
           ),
           const SizedBox(height: 28),
 
@@ -439,7 +497,7 @@ class _TransactionDetailSheetState extends State<TransactionDetailSheet> {
                 child: ElevatedButton(
                   onPressed: () => Navigator.pop(context),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF1B5E20),
+                    backgroundColor: Theme.of(context).colorScheme.primary,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   ),

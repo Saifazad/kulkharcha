@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../../../app.dart';
 
 class HomeHeader extends StatelessWidget {
   final String userName;
@@ -10,6 +12,8 @@ class HomeHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -32,7 +36,27 @@ class HomeHeader extends StatelessWidget {
             ),
           ],
         ),
-        const Icon(Icons.dark_mode_outlined, size: 28),
+        GestureDetector(
+          onTap: () async {
+            try {
+              final newMode = isDark ? ThemeMode.light : ThemeMode.dark;
+              themeNotifier.value = newMode;
+              final prefs = await SharedPreferences.getInstance();
+              await prefs.setString('theme_mode', newMode == ThemeMode.light ? 'light' : 'dark');
+            } catch (e) {
+              debugPrint("Error saving theme choice: $e");
+            }
+          },
+          behavior: HitTestBehavior.opaque,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Icon(
+              isDark ? Icons.light_mode_rounded : Icons.dark_mode_outlined,
+              size: 28,
+              color: isDark ? Colors.amber[400] : Theme.of(context).colorScheme.primary,
+            ),
+          ),
+        ),
       ],
     );
   }

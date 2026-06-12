@@ -111,16 +111,22 @@ class _CategoryItem extends StatelessWidget {
       width: 105,
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardTheme.color ?? Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.black.withOpacity(0.04)),
+        border: Border.all(
+          color: Theme.of(context).brightness == Brightness.dark
+              ? Colors.white10
+              : Colors.black.withOpacity(0.04),
+        ),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           CircleAvatar(
-            backgroundColor: bg,
+            backgroundColor: Theme.of(context).brightness == Brightness.dark
+                ? iconColor.withOpacity(0.15)
+                : bg,
             radius: 18,
             child: Icon(icon, color: iconColor, size: 18),
           ),

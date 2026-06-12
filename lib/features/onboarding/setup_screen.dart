@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:kulkharcha/core/widgets/custom_textfield.dart';
 import 'package:kulkharcha/features/home/screens/home_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../../core/constants/color_constants.dart';
 
 class SetupScreen extends StatefulWidget {
   const SetupScreen({super.key});
@@ -50,7 +49,7 @@ class _SetupScreenState extends State<SetupScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 30.0),
@@ -65,31 +64,31 @@ class _SetupScreenState extends State<SetupScreen> {
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.primaryEmerald.withOpacity(0.1),
+                  color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: const Text(
+                child: Text(
                   "BAS EK KADAM AUR",
                   style: TextStyle(
-                    color: AppColors.primaryEmerald,
+                    color: Theme.of(context).colorScheme.primary,
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
               const SizedBox(height: 16),
-              const Text(
+              Text(
                 "Aapka Naam Kya Hai?",
                 style: TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
               const SizedBox(height: 12),
-              const Text(
+              Text(
                 "Bhai, apna naam bata do taaki hum aapka hisaab sahi se rakh sakein.",
-                style: TextStyle(fontSize: 16, color: Colors.grey),
+                style: TextStyle(fontSize: 16, color: Theme.of(context).brightness == Brightness.dark ? Colors.white70 : Colors.grey),
               ),
               const SizedBox(height: 40),
 
@@ -111,7 +110,7 @@ class _SetupScreenState extends State<SetupScreen> {
                 child: ElevatedButton(
                   onPressed: _saveNameAndGo,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryEmerald,
+                    backgroundColor: Theme.of(context).colorScheme.primary,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),

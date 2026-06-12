@@ -113,7 +113,7 @@ class _PermissionScreenState extends State<PermissionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.lightBackground,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
@@ -124,13 +124,15 @@ class _PermissionScreenState extends State<PermissionScreen> {
               // Security Premium Badge Header
               Container(
                 padding: const EdgeInsets.all(16),
-                decoration: const BoxDecoration(
-                  color: AppColors.softGreen,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white.withOpacity(0.05)
+                      : AppColors.softGreen,
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.shield_outlined,
-                  color: AppColors.primaryEmerald,
+                  color: Theme.of(context).colorScheme.primary,
                   size: 36,
                 ),
               ),
@@ -142,8 +144,8 @@ class _PermissionScreenState extends State<PermissionScreen> {
                       fontSize: 26,
                       fontWeight: FontWeight.w800,
                     ) ??
-                    const TextStyle(
-                      color: AppColors.textDark,
+                    TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 26,
                       fontWeight: FontWeight.bold,
                     ),
@@ -189,11 +191,11 @@ class _PermissionScreenState extends State<PermissionScreen> {
               ),
 
               // Bottom Sheet Simulation Actions
-              const Center(
+              Center(
                 child: Text(
                   "🔒 No Cloud • No Internet Needed • 100% Safe",
                   style: TextStyle(
-                    color: AppColors.primaryEmerald,
+                    color: Theme.of(context).colorScheme.primary,
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 0.5,
@@ -204,7 +206,7 @@ class _PermissionScreenState extends State<PermissionScreen> {
               ElevatedButton(
                 onPressed: _isProcessing ? null : _requestAppPermissions,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.accentGreen,
+                  backgroundColor: Theme.of(context).colorScheme.primary,
                   foregroundColor: AppColors.textLight,
                   minimumSize: const Size(double.infinity, 50),
                   shape: RoundedRectangleBorder(
@@ -244,24 +246,32 @@ class _PermissionScreenState extends State<PermissionScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.lightSurface,
+        color: Theme.of(context).cardTheme.color ?? Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.borderLight),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.shadowColor,
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        border: Border.all(
+          color: Theme.of(context).brightness == Brightness.dark
+              ? Colors.white10
+              : AppColors.borderLight,
+        ),
+        boxShadow: Theme.of(context).brightness == Brightness.dark
+            ? []
+            : [
+                BoxShadow(
+                  color: AppColors.shadowColor,
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           CircleAvatar(
-            backgroundColor: AppColors.softGreen,
+            backgroundColor: Theme.of(context).brightness == Brightness.dark
+                ? Theme.of(context).colorScheme.primary.withOpacity(0.15)
+                : AppColors.softGreen,
             radius: 22,
-            child: Icon(icon, color: AppColors.accentGreen, size: 22),
+            child: Icon(icon, color: Theme.of(context).colorScheme.primary, size: 22),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -270,8 +280,8 @@ class _PermissionScreenState extends State<PermissionScreen> {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
-                    color: AppColors.textDark,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),

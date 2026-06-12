@@ -11,6 +11,9 @@ import '../widgets/budget_card.dart';
 import '../widgets/budget_settings_sheet.dart';
 import '../widgets/category_section.dart';
 import '../widgets/recent_transactions_list.dart';
+import '../../history/screens/history_screen.dart';
+import '../../analytics/screens/analytics_screen.dart';
+import '../../settings/screens/settings_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -31,6 +34,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   bool _showMonthly = false;
   bool _isLoading = true;
   bool _isSmsPermissionGranted = true;
+  int _currentIndex = 0;
 
   // ── Lifecycle ──────────────────────────────────────────────────────────────
   @override
@@ -80,6 +84,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   Future<void> _fetchData() async {
     setState(() => _isLoading = true);
     try {
+      await _loadPrefs();
       final tx = await DatabaseHelper.instance.getAllTransactions();
       final cat = await DatabaseHelper.instance.getCategoryWiseExpenses();
       _updateState(tx, cat);
@@ -147,9 +152,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     });
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("✅ Budget limits saved!"),
-          backgroundColor: Color(0xFF1B5E20),
+        SnackBar(
+          content: const Text("✅ Budget limits saved!"),
+          backgroundColor: Theme.of(context).colorScheme.primary,
         ),
       );
     }
@@ -238,121 +243,177 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     return category == 'General' ? 'Transaction' : category;
   }
 
+  Widget _buildHomeTab() {
+    return RefreshIndicator(
+      onRefresh: _syncAndFetch,
+      color: Theme.of(context).colorScheme.primary,
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 20),
+            HomeHeader(userName: _userName),
+            const SizedBox(height: 25),
+            if (!_isSmsPermissionGranted) ...[
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.red.withOpacity(0.15)
+                      : const Color(0xFFFEEBEE),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.red.withOpacity(0.3)
+                        : const Color(0xFFFFCDD2),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.warning_amber_rounded,
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.red[300]
+                          : const Color(0xFFC62828),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        "SMS Permission blocked hai. Auto-tracking active nahi hai.",
+                        style: TextStyle(
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.red[200]
+                              : const Color(0xFFC62828),
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () => openAppSettings(),
+                      style: TextButton.styleFrom(
+                        backgroundColor: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.red[700]
+                            : const Color(0xFFC62828),
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      ),
+                      child: const Text(
+                        "Settings",
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 15),
+            ],
+            if (_isLoading)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 60),
+                child: Center(
+                  child: CircularProgressIndicator(
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                ),
+              )
+            else ...[
+              BudgetCard(
+                todayExpense: _todayExpense,
+                monthlyExpense: _monthlyExpense,
+                dailyLimit: _dailyLimit,
+                monthlyLimit: _monthlyLimit,
+                showMonthly: _showMonthly,
+                onToggleDaily: () => setState(() => _showMonthly = false),
+                onToggleMonthly: () => setState(() => _showMonthly = true),
+                onSettingsTap: () => BudgetSettingsSheet.show(
+                  context,
+                  dailyLimit: _dailyLimit,
+                  monthlyLimit: _monthlyLimit,
+                  onSave: _saveBudgetLimits,
+                ),
+              ),
+              const SizedBox(height: 30),
+              CategorySection(categoryExpenses: _categoryExpenses),
+              const SizedBox(height: 30),
+              RecentTransactionsList(
+                transactions: _transactions,
+                getCleanTitle: _getCleanTitle,
+                onRefresh: _fetchData,
+                onViewAll: () {
+                  setState(() {
+                    _currentIndex = 1;
+                  });
+                },
+              ),
+            ],
+            const SizedBox(height: 100),
+          ],
+        ),
+      ),
+    );
+  }
+
   // ── Build ──────────────────────────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
+    Widget bodyContent;
+    switch (_currentIndex) {
+      case 0:
+        bodyContent = _buildHomeTab();
+        break;
+      case 1:
+        bodyContent = HistoryScreen(
+          onRefreshParent: _fetchData,
+          getCleanTitle: _getCleanTitle,
+        );
+        break;
+      case 2:
+        bodyContent = AnalyticsScreen(
+          onRefreshParent: _fetchData,
+          getCleanTitle: _getCleanTitle,
+        );
+        break;
+      case 3:
+        bodyContent = SettingsScreen(
+          onRefreshParent: _fetchData,
+        );
+        break;
+      default:
+        bodyContent = _buildHomeTab();
+    }
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAF7),
-      body: SafeArea(
-        child: RefreshIndicator(
-          onRefresh: _syncAndFetch,
-          color: const Color(0xFF1B5E20),
-          child: SingleChildScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 20),
-                HomeHeader(userName: _userName),
-                const SizedBox(height: 25),
-                if (!_isSmsPermissionGranted) ...[
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFFEEBEE),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: const Color(0xFFFFCDD2)),
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.warning_amber_rounded, color: Color(0xFFC62828)),
-                        const SizedBox(width: 12),
-                        const Expanded(
-                          child: Text(
-                            "SMS Permission blocked hai. Auto-tracking active nahi hai.",
-                            style: TextStyle(
-                              color: Color(0xFFC62828),
-                              fontSize: 13,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                        TextButton(
-                          onPressed: () => openAppSettings(),
-                          style: TextButton.styleFrom(
-                            backgroundColor: const Color(0xFFC62828),
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                          ),
-                          child: const Text(
-                            "Settings",
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 15),
-                ],
-                if (_isLoading)
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 60),
-                    child: Center(
-                      child: CircularProgressIndicator(
-                        color: Color(0xFF1B5E20),
-                      ),
-                    ),
-                  )
-                else ...[
-                  BudgetCard(
-                    todayExpense: _todayExpense,
-                    monthlyExpense: _monthlyExpense,
-                    dailyLimit: _dailyLimit,
-                    monthlyLimit: _monthlyLimit,
-                    showMonthly: _showMonthly,
-                    onToggleDaily: () => setState(() => _showMonthly = false),
-                    onToggleMonthly: () => setState(() => _showMonthly = true),
-                    onSettingsTap: () => BudgetSettingsSheet.show(
-                      context,
-                      dailyLimit: _dailyLimit,
-                      monthlyLimit: _monthlyLimit,
-                      onSave: _saveBudgetLimits,
-                    ),
-                  ),
-                  const SizedBox(height: 30),
-                  CategorySection(categoryExpenses: _categoryExpenses),
-                  const SizedBox(height: 30),
-                  RecentTransactionsList(
-                    transactions: _transactions,
-                    getCleanTitle: _getCleanTitle,
-                    onRefresh: _fetchData,
-                  ),
-                ],
-                const SizedBox(height: 100),
-              ],
-            ),
-          ),
-        ),
-      ),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      body: SafeArea(child: bodyContent),
       floatingActionButton: FloatingActionButton(
         onPressed: () {},
-        backgroundColor: const Color(0xFF1B5E20),
+        backgroundColor: Theme.of(context).colorScheme.primary,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         child: const Icon(Icons.add, color: Colors.white, size: 30),
       ),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
-        selectedItemColor: const Color(0xFF1B5E20),
+        selectedItemColor: Theme.of(context).colorScheme.primary,
         unselectedItemColor: Colors.grey,
         showSelectedLabels: true,
-        currentIndex: 0,
+        currentIndex: _currentIndex,
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+          if (index == 0) {
+            _loadPrefs();
+          }
+        },
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home_filled), label: "Home"),
           BottomNavigationBarItem(icon: Icon(Icons.history), label: "History"),

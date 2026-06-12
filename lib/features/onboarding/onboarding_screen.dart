@@ -38,7 +38,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Stack(
         children: [
           // 1. Swipeable Content
@@ -62,13 +62,15 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     height: 200,
                     width: 200,
                     decoration: BoxDecoration(
-                      color: AppColors.primaryEmerald.withOpacity(0.05),
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.white.withOpacity(0.05)
+                          : AppColors.primaryEmerald.withOpacity(0.05),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
                       data.icon,
                       size: 100,
-                      color: AppColors.primaryEmerald,
+                      color: Theme.of(context).colorScheme.primary,
                     ),
                   ),
                   const SizedBox(height: 40),
@@ -88,7 +90,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 16,
-                        color: Colors.grey.shade600,
+                        color: Theme.of(context).brightness == Brightness.dark ? Colors.white70 : Colors.grey.shade600,
                         height: 1.5,
                       ),
                     ),
@@ -110,10 +112,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 TextButton(
                   onPressed: () =>
                       _pageController.jumpToPage(onboardingContents.length - 1),
-                  child: const Text(
+                  child: Text(
                     "SKIP",
                     style: TextStyle(
-                      color: Colors.grey,
+                      color: Theme.of(context).brightness == Brightness.dark ? Colors.white54 : Colors.grey,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -123,8 +125,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 SmoothPageIndicator(
                   controller: _pageController,
                   count: onboardingContents.length,
-                  effect: const ExpandingDotsEffect(
-                    activeDotColor: AppColors.primaryEmerald,
+                  effect: ExpandingDotsEffect(
+                    activeDotColor: Theme.of(context).colorScheme.primary,
                     dotHeight: 8,
                     dotWidth: 8,
                     expansionFactor: 4,
@@ -137,7 +139,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     ? ElevatedButton(
                         onPressed: _completeOnboarding,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primaryEmerald,
+                          backgroundColor: Theme.of(context).colorScheme.primary,
                           minimumSize: const Size(100, 48), // Add minimum size
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -160,9 +162,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           duration: const Duration(milliseconds: 600),
                           curve: Curves.easeInQuad,
                         ),
-                        icon: const Icon(
+                        icon: Icon(
                           Icons.arrow_forward_ios,
-                          color: AppColors.primaryEmerald,
+                          color: Theme.of(context).colorScheme.primary,
                           size: 20,
                         ),
                       ),

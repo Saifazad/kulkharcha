@@ -49,9 +49,9 @@ class _BudgetSettingsSheetState extends State<BudgetSettingsSheet> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      decoration: BoxDecoration(
+        color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E1E1E) : Colors.white,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
       ),
       padding: EdgeInsets.only(
         left: 24,
@@ -68,7 +68,7 @@ class _BudgetSettingsSheetState extends State<BudgetSettingsSheet> {
             child: Container(
               width: 50, height: 5,
               decoration: BoxDecoration(
-                color: Colors.grey[300],
+                color: Theme.of(context).brightness == Brightness.dark ? Colors.white24 : Colors.grey[300],
                 borderRadius: BorderRadius.circular(10),
               ),
             ),
@@ -91,8 +91,8 @@ class _BudgetSettingsSheetState extends State<BudgetSettingsSheet> {
             min: 100,
             max: 10000,
             divisions: 99,
-            activeColor: const Color(0xFF1B5E20),
-            inactiveColor: const Color(0xFFE8F5E9),
+            activeColor: Theme.of(context).colorScheme.primary,
+            inactiveColor: Theme.of(context).colorScheme.primary.withOpacity(0.2),
             onChanged: (val) => setState(() => _tempDaily = val),
           ),
           const _SliderRange(min: "₹100", max: "₹10,000"),
@@ -105,8 +105,8 @@ class _BudgetSettingsSheetState extends State<BudgetSettingsSheet> {
             min: 1000,
             max: 200000,
             divisions: 199,
-            activeColor: const Color(0xFF1B5E20),
-            inactiveColor: const Color(0xFFE8F5E9),
+            activeColor: Theme.of(context).colorScheme.primary,
+            inactiveColor: Theme.of(context).colorScheme.primary.withOpacity(0.2),
             onChanged: (val) => setState(() => _tempMonthly = val),
           ),
           const _SliderRange(min: "₹1,000", max: "₹2,00,000"),
@@ -121,7 +121,7 @@ class _BudgetSettingsSheetState extends State<BudgetSettingsSheet> {
                 if (mounted) Navigator.pop(context);
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF1B5E20),
+                backgroundColor: Theme.of(context).colorScheme.primary,
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               ),
@@ -151,7 +151,7 @@ class _LimitRow extends StatelessWidget {
       children: [
         Row(
           children: [
-            Icon(icon, color: const Color(0xFF1B5E20), size: 20),
+            Icon(icon, color: Theme.of(context).brightness == Brightness.dark ? Colors.green[300] : const Color(0xFF1B5E20), size: 20),
             const SizedBox(width: 8),
             Text(label, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
           ],
@@ -159,13 +159,17 @@ class _LimitRow extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
           decoration: BoxDecoration(
-            color: const Color(0xFFE8F5E9),
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.green.withOpacity(0.15)
+                : const Color(0xFFE8F5E9),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Text(
             "₹${amount.toStringAsFixed(0)}",
-            style: const TextStyle(
-              color: Color(0xFF1B5E20),
+            style: TextStyle(
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.green[300]
+                  : const Color(0xFF1B5E20),
               fontWeight: FontWeight.w900,
               fontSize: 16,
             ),

@@ -35,12 +35,12 @@ class BudgetCard extends StatelessWidget {
         ? Colors.red[600]!
         : progressPercent > 80
             ? Colors.orange[700]!
-            : const Color(0xFF1B5E20);
+            : Theme.of(context).colorScheme.primary;
 
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardTheme.color ?? Colors.white,
         borderRadius: BorderRadius.circular(28),
         boxShadow: [
           BoxShadow(
@@ -69,7 +69,7 @@ class BudgetCard extends StatelessWidget {
               ),
               GestureDetector(
                 onTap: onSettingsTap,
-                child: const Icon(Icons.tune_rounded, color: Color(0xFF1B5E20), size: 22),
+                child: Icon(Icons.tune_rounded, color: Theme.of(context).colorScheme.primary, size: 22),
               ),
             ],
           ),
@@ -80,7 +80,9 @@ class BudgetCard extends StatelessWidget {
             height: 36,
             padding: const EdgeInsets.all(3),
             decoration: BoxDecoration(
-              color: const Color(0xFFF1F1F1),
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? const Color(0xFF242424)
+                  : const Color(0xFFF1F1F1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Row(
@@ -101,7 +103,7 @@ class BudgetCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 36,
                     fontWeight: FontWeight.w900,
-                    color: isOverBudget ? Colors.red[700] : Colors.black,
+                    color: isOverBudget ? Colors.red[700] : Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
                 TextSpan(
@@ -123,7 +125,9 @@ class BudgetCard extends StatelessWidget {
             child: LinearProgressIndicator(
               value: progress,
               minHeight: 10,
-              backgroundColor: const Color(0xFFF1F1F1),
+              backgroundColor: Theme.of(context).brightness == Brightness.dark
+                  ? const Color(0xFF242424)
+                  : const Color(0xFFF1F1F1),
               valueColor: AlwaysStoppedAnimation<Color>(barColor),
             ),
           ),
@@ -145,13 +149,17 @@ class BudgetCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFE8F5E9),
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.green.withOpacity(0.15)
+                        : const Color(0xFFE8F5E9),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Text(
                     "₹${remaining.toStringAsFixed(0)} bachi",
-                    style: const TextStyle(
-                      color: Color(0xFF2E7D32),
+                    style: TextStyle(
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.green[300]
+                          : const Color(0xFF2E7D32),
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
                     ),
@@ -180,7 +188,11 @@ class _ToggleTab extends StatelessWidget {
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           decoration: BoxDecoration(
-            color: isActive ? Colors.white : Colors.transparent,
+            color: isActive
+                ? (Theme.of(context).brightness == Brightness.dark
+                    ? const Color(0xFF3A3A3A)
+                    : Colors.white)
+                : Colors.transparent,
             borderRadius: BorderRadius.circular(10),
             boxShadow: isActive
                 ? [BoxShadow(color: Colors.black.withOpacity(0.08), blurRadius: 6, offset: const Offset(0, 2))]
@@ -192,7 +204,7 @@ class _ToggleTab extends StatelessWidget {
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.bold,
-              color: isActive ? const Color(0xFF1B5E20) : Colors.grey,
+              color: isActive ? Theme.of(context).colorScheme.primary : Colors.grey,
             ),
           ),
         ),

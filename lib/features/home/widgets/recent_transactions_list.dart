@@ -6,28 +6,37 @@ class RecentTransactionsList extends StatelessWidget {
   final List<Map<String, dynamic>> transactions;
   final String Function(String category, String? desc) getCleanTitle;
   final Future<void> Function() onRefresh;
+  final VoidCallback? onViewAll;
 
   const RecentTransactionsList({
     super.key,
     required this.transactions,
     required this.getCleanTitle,
     required this.onRefresh,
+    this.onViewAll,
   });
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const Row(
+        Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
+            const Text(
               "Recent Transactions",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-            Text(
-              "View All",
-              style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
+            GestureDetector(
+              onTap: onViewAll,
+              behavior: HitTestBehavior.opaque,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                child: Text(
+                  "View All",
+                  style: TextStyle(color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.bold),
+                ),
+              ),
             ),
           ],
         ),
@@ -35,15 +44,17 @@ class RecentTransactionsList extends StatelessWidget {
         Container(
           width: double.infinity,
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Theme.of(context).cardTheme.color ?? Colors.white,
             borderRadius: BorderRadius.circular(24),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.01),
-                blurRadius: 10,
-                offset: const Offset(0, 5),
-              ),
-            ],
+            boxShadow: Theme.of(context).brightness == Brightness.dark
+                ? []
+                : [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.01),
+                      blurRadius: 10,
+                      offset: const Offset(0, 5),
+                    ),
+                  ],
           ),
           child: transactions.isEmpty
               ? const Padding(
@@ -72,7 +83,6 @@ class RecentTransactionsList extends StatelessWidget {
                     final category = tx['category'] as String? ?? 'General';
                     final desc = tx['description'] as String? ?? '';
                     final title = getCleanTitle(category, desc);
-                    final style = resolveCategoryStyle(category);
 
                     return Dismissible(
                       key: Key(txId.toString()),
